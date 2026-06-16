@@ -1,0 +1,18 @@
+# Local Kubernetes / Helm noise
+*.tgz
+charts/
+kubeconfig*
+.kube/
+
+# Editor / OS
+.claude/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Secrets — never commit these
+*.key
+*.pem
+secrets.yaml
+*.env

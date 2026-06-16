@@ -1,0 +1,9 @@
+controller:
+  image:
+    pullPolicy: Always
+  extraEnv:
+    KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
+    OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector-opentelemetry-collector.default.svc.cluster.local:4317"
+    OTEL_SERVICE_NAME: "agentgateway"
+    OTEL_TRACES_EXPORTER: "otlp"
+    OTEL_PROPAGATORS: "tracecontext,baggage"

@@ -1,0 +1,62 @@
+mode: daemonset
+
+image:
+  repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
+
+command:
+  name: otelcol-k8s
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+useGOMEMLIMIT: true
+
+presets:
+  kubernetesAttributes:
+    enabled: true
+  logsCollection:
+    enabled: true
+
+service:
+  enabled: true
+  type: ClusterIP
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    batch: {}
+    memory_limiter:
+      check_interval: 5s
+      limit_percentage: 80
+      spike_limit_percentage: 25
+
+  exporters:
+    otlp_http/coroot:
+      endpoint: "http://coroot-coroot.coroot.svc.cluster.local:8080"
+      encoding: proto
+      tls:
+        insecure: true
+      compression: none
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlp_http/coroot]
+      logs:
+        receivers: [otlp, filelog]
+        processors: [memory_limiter, batch]
+        exporters: [otlp_http/coroot]

@@ -1,0 +1,35 @@
+# Emits a gateway-level "frontend" span for every request and pushes it to
+# the same OTel collector the router uses. This gives one continuous trace:
+#   gateway span -> ExtProc -> router spans
+# The `attributes` block enriches each span with request metadata, which is
+# invaluable for filtering traces by tenant, route, or client.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: tracing
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - kind: Gateway
+      name: agentgateway-proxy
+      group: gateway.networking.k8s.io
+  frontend:
+    tracing:
+      backendRef:
+        name: otel-collector-opentelemetry-collector
+        namespace: default
+        port: 4317
+      protocol: GRPC
+      clientSampling: "true"
+      randomSampling: "true"
+      resources:
+        - name: deployment.environment.name
+          expression: '"production"'
+        - name: service.version
+          expression: '"test"'
+      attributes:
+        add:
+          - expression: 'request.headers["x-header-tag"]'
+            name: request
+          - expression: 'request.host'
+            name: host
