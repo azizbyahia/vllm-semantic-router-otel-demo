@@ -18,7 +18,7 @@ When you send a prompt to an AI system, the first question is never "what is the
 
 In this post we will do two things. First, understand how semantic routing works conceptually. Second, build it on Kubernetes using the **vLLM Semantic Router** with **agentgateway**, then add a full observability layer using **OpenTelemetry** and **Coroot** so we can see — with real traces — exactly how long each routing decision takes and where latency hides.
 
-![Semantic Routing PoC overview](/images/blogs/semantic-routing/sr.png)
+![Semantic Routing PoC overview](images/sr.png)
 
 ---
 
@@ -54,7 +54,7 @@ Once signals are extracted, the **decision engine** picks a route using one of 1
 
 The key insight is that routing is not a single binary decision — it is a pipeline of classifiers that runs in parallel and whose outputs feed a final decision function.
 
-![Semantic Decision Engine ](/images/blogs/semantic-routing/sr1.png)
+![Semantic Decision Engine ](images/sr1.png)
 
 *\* The priority numbers are not fixed — they are values **you assign to each decision** in the config. Here the keyword decision happens to be `20` and the domain decisions `10` (and `general` is `1`), which is why keyword wins ties. Set them however you like; a keyword decision could just as easily be `5`.*
 
@@ -68,7 +68,7 @@ Envoy ExtProc is a gRPC-based protocol that lets an external service intercept a
 
 The client sends `"model": "auto"`. The router intercepts, classifies, rewrites to `"model": "math-expert"`. vLLM receives the correct model name. The client never needed to know.
 
-![Semantic Routing PoC overview](/images/blogs/semantic-routing/sr3.png)
+![Semantic Routing PoC overview](images/sr3.png)
 
 
 This design means routing logic is infrastructure-level, not application-level. Any OpenAI-compatible client works without modification.
@@ -591,8 +591,11 @@ Now open Coroot at `http://localhost:8880` and navigate to **Services → semant
 
 Each trace for a routing decision will show a hierarchy of spans. Because we enabled gateway-level tracing in Step 8, the trace now starts at the **agentgateway frontend span** and continues down into the router — one continuous timeline from the moment the request hits the gateway to the mutated response:
 
+![Coroot trace timeline — gateway span through router spans](images/sr4.png)
 
+Drilling into a single span breaks the routing decision down into its parts, so you can see exactly where the milliseconds go:
 
+![Coroot span detail for a single routing decision](images/sr5.png)
 
 ---
 

@@ -9,11 +9,13 @@ gateway layer and rewrites `"model": "auto"` into the right specialist
 makes the whole decision observable, so you can see exactly where every
 millisecond goes.
 
+![Semantic Routing PoC overview](blog/images/sr.png)
+
 Stack: [vLLM Semantic Router](https://vllm-semantic-router.com) ·
 [agentgateway](https://agentgateway.dev) · Kubernetes (kind) ·
 [OpenTelemetry](https://opentelemetry.io) · [Coroot](https://coroot.com)
 
-📝 Full write-up: [`blog/semantic-routing-observability.md`](blog/semantic-routing-observability.md) ·
+📝 Full write-up (with diagrams): [`blog/semantic-routing-observability.md`](blog/semantic-routing-observability.md) ·
 TL;DR: [`blog/SUMMARY.md`](blog/SUMMARY.md)
 
 ---
